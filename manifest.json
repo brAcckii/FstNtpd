@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Sync Notebook",
+  "description": "Fast tabbed notebook synced with your Chrome/Google account.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "102",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Sync Notebook",
+    "default_popup": "popup.html"
+  }
+}

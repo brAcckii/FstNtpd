@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sync Notebook</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="app" aria-label="Sync Notebook">
+      <header class="toolbar">
+        <button id="addNote" class="button primary" type="button">Add</button>
+        <label class="searchWrap" for="searchInput">
+          <span class="srOnly">Quick search</span>
+          <input id="searchInput" type="search" placeholder="Quick search" autocomplete="off">
+        </label>
+        <button id="syncNow" class="button" type="button">Sync</button>
+      </header>
+
+      <section class="statusLine" aria-live="polite">
+        <span id="syncMode">Chrome Sync</span>
+        <span id="statusText">Loading...</span>
+      </section>
+
+      <section class="notesPanel" aria-label="Notes">
+        <ul id="notesList" class="notesList"></ul>
+      </section>
+
+      <section class="editorPanel" aria-label="Current note">
+        <input id="titleInput" class="titleInput" type="text" placeholder="Untitled note" autocomplete="off">
+        <textarea id="noteEditor" class="noteEditor" spellcheck="true" placeholder="Paste or type a note..."></textarea>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
