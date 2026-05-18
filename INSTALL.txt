@@ -9,6 +9,9 @@ Package contents:
 - popup.html
 - popup.css
 - popup.js
+- background.js
 - icons/
+
+Use the page context menu to save selected text: select text, right-click, then choose Add to FstNtpd.
 
 Notes are stored with chrome.storage.sync. Chrome enforces sync storage quota, so very large note collections may need trimming.
