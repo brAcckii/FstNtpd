@@ -269,15 +269,23 @@ function renderList() {
     item.title = buildTooltip(note);
     item.addEventListener("click", () => selectNote(id));
 
+    const text = document.createElement("span");
+    text.className = "noteText";
+
     const title = document.createElement("span");
     title.className = "noteTitle";
     title.textContent = note.title;
+
+    const preview = document.createElement("span");
+    preview.className = "notePreview";
+    preview.textContent = buildPreview(note);
 
     const meta = document.createElement("span");
     meta.className = "noteMeta";
     meta.textContent = formatDate(note.updatedAt);
 
-    item.append(title, meta);
+    text.append(title, preview);
+    item.append(text, meta);
     fragment.append(item);
   }
 
@@ -285,8 +293,13 @@ function renderList() {
 }
 
 function buildTooltip(note) {
-  const preview = note.content.trim().split(/\s+/).slice(0, 18).join(" ");
+  const preview = buildPreview(note);
   return `Last modified: ${new Date(note.updatedAt).toLocaleString()}${preview ? `\n${preview}` : ""}`;
+}
+
+function buildPreview(note) {
+  const preview = note.content.trim().replace(/\s+/g, " ");
+  return preview ? preview.slice(0, 96) : "Empty note";
 }
 
 function touchIndexNote(note) {
@@ -296,7 +309,7 @@ function touchIndexNote(note) {
     createdAt: note.createdAt,
     updatedAt: note.updatedAt,
     manualTitle: note.manualTitle,
-    preview: note.content.trim().slice(0, 160),
+    preview: buildPreview(note),
     length: note.content.length,
     chunkCount: chunkText(note.content).length,
   };

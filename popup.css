@@ -19,13 +19,13 @@
 
 html,
 body {
+  width: 360px;
+  height: 560px;
   margin: 0;
-  min-width: 420px;
-  min-height: 600px;
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  font: 13px/1.4 Arial, Helvetica, sans-serif;
+  font: 12px/1.35 Arial, Helvetica, sans-serif;
 }
 
 button,
@@ -36,8 +36,9 @@ textarea {
 
 .app {
   display: grid;
-  grid-template-rows: auto auto 225px 1fr;
-  height: 600px;
+  grid-template-rows: auto auto 205px 1fr;
+  width: 360px;
+  height: 560px;
   border: 1px solid var(--border);
   background: #fff;
 }
@@ -45,18 +46,18 @@ textarea {
 .toolbar {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
-  padding: 6px;
+  padding: 3px;
   border-bottom: 1px solid var(--border);
   background: linear-gradient(#ffffff, #edf3fb);
 }
 
 .button {
-  min-height: 26px;
-  padding: 3px 10px;
+  min-height: 22px;
+  padding: 2px 8px;
   border: 1px solid var(--button-border);
-  border-radius: 4px;
+  border-radius: 3px;
   background: var(--button);
   color: #214466;
   cursor: pointer;
@@ -76,10 +77,10 @@ textarea {
 
 .searchWrap input {
   width: 100%;
-  min-height: 26px;
-  padding: 3px 8px;
+  min-height: 22px;
+  padding: 2px 7px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 3px;
   background: #fff;
 }
 
@@ -92,11 +93,11 @@ textarea {
 .statusLine {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  padding: 3px 8px;
+  gap: 8px;
+  padding: 2px 6px;
   border-bottom: 1px solid var(--border);
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
   white-space: nowrap;
 }
 
@@ -118,9 +119,9 @@ textarea {
   display: grid;
   grid-template-columns: 18px 1fr auto;
   gap: 5px;
-  align-items: center;
-  min-height: 24px;
-  padding: 2px 6px;
+  align-items: start;
+  min-height: 34px;
+  padding: 3px 6px;
   border: 1px solid transparent;
   color: var(--text);
   cursor: pointer;
@@ -130,6 +131,7 @@ textarea {
 .noteItem::before {
   width: 13px;
   height: 11px;
+  margin-top: 3px;
   border: 1px solid #e1b845;
   border-radius: 2px;
   background: linear-gradient(#ffe99a, #f3c948);
@@ -146,13 +148,29 @@ textarea {
   background: #eef6ff;
 }
 
+.noteText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
 .noteTitle {
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.notePreview {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .noteMeta {
+  padding-top: 1px;
   color: var(--muted);
   font-size: 10px;
 }
@@ -172,7 +190,7 @@ textarea {
 
 .titleInput {
   width: 100%;
-  padding: 6px 8px;
+  padding: 5px 7px;
   border: 0;
   border-bottom: 1px solid var(--border);
   background: #fffdf0;
