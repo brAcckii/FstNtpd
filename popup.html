@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sync Notebook</title>
+    <title>FstNtpd</title>
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <main class="app" aria-label="Sync Notebook">
+    <main class="app" aria-label="FstNtpd">
       <header class="toolbar">
         <button id="addNote" class="button primary" type="button">Add</button>
         <label class="searchWrap" for="searchInput">
@@ -27,7 +27,14 @@
       </section>
 
       <section class="editorPanel" aria-label="Current note">
-        <input id="titleInput" class="titleInput" type="text" placeholder="Untitled note" autocomplete="off">
+        <div class="editorHeader">
+          <input id="titleInput" class="titleInput" type="text" placeholder="Untitled note" autocomplete="off">
+          <div class="editorActions" aria-label="Note actions">
+            <button id="copyNote" class="button tiny" type="button">Copy</button>
+            <button id="openLinks" class="button tiny" type="button">Links</button>
+            <button id="deleteNote" class="button tiny danger" type="button">Del</button>
+          </div>
+        </div>
         <textarea id="noteEditor" class="noteEditor" spellcheck="true" placeholder="Paste or type a note..."></textarea>
       </section>
     </main>

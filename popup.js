@@ -45,6 +45,9 @@ function bindElements() {
   elements.addNote = document.getElementById("addNote");
   elements.searchInput = document.getElementById("searchInput");
   elements.syncNow = document.getElementById("syncNow");
+  elements.copyNote = document.getElementById("copyNote");
+  elements.openLinks = document.getElementById("openLinks");
+  elements.deleteNote = document.getElementById("deleteNote");
   elements.syncMode = document.getElementById("syncMode");
   elements.statusText = document.getElementById("statusText");
   elements.notesList = document.getElementById("notesList");
@@ -58,6 +61,9 @@ function bindEvents() {
     await flushSave();
     await reloadFromStorage("Synced manually");
   });
+  elements.copyNote.addEventListener("click", copyActiveNote);
+  elements.openLinks.addEventListener("click", openLinksFromActiveNote);
+  elements.deleteNote.addEventListener("click", deleteActiveNote);
   elements.searchInput.addEventListener("input", renderList);
 
   elements.titleInput.addEventListener("input", () => {
@@ -89,6 +95,7 @@ function bindEvents() {
     }
     touchIndexNote(note);
     renderList();
+    updateActionButtons(note);
     queueSave("Saving...");
   });
 }
@@ -225,12 +232,77 @@ async function selectNote(id) {
   await saveIndexOnly();
 }
 
+async function deleteActiveNote() {
+  const note = getActiveNote();
+  if (!note || !confirm(`Delete "${note.title}"?`)) {
+    return;
+  }
+
+  await flushSave();
+  ignoreRemoteChangesUntil = Date.now() + 1500;
+
+  if (index.order.length === 1) {
+    note.content = "";
+    note.title = "Untitled note";
+    note.manualTitle = false;
+    note.updatedAt = Date.now();
+    touchIndexNote(note);
+    showActiveNote();
+    renderList();
+    await persistNotebook(note.id);
+    setStatus("Note cleared");
+    return;
+  }
+
+  const deletedIndex = index.order.indexOf(note.id);
+  await removeStoredNote(note);
+  noteCache.delete(note.id);
+  delete index.notes[note.id];
+  index.order = index.order.filter((id) => id !== note.id);
+  activeId = index.order[Math.min(deletedIndex, index.order.length - 1)] || index.order[0] || null;
+  index.activeId = activeId;
+  showActiveNote();
+  renderList();
+  await saveIndexOnly();
+  setStatus("Note deleted");
+}
+
+async function copyActiveNote() {
+  const note = getActiveNote();
+  if (!note || !note.content) {
+    setStatus("Nothing to copy");
+    return;
+  }
+  await writeClipboard(note.content);
+  setStatus("Note copied");
+}
+
+async function openLinksFromActiveNote() {
+  const note = getActiveNote();
+  const links = note ? extractLinks(note.content) : [];
+  if (!links.length) {
+    setStatus("No links found");
+    return;
+  }
+  for (const link of links) {
+    await openUrl(link);
+  }
+  setStatus(`Opened ${links.length} link${links.length === 1 ? "" : "s"}`);
+}
+
 function showActiveNote() {
   const note = getActiveNote();
   elements.titleInput.value = note ? note.title : "";
   elements.noteEditor.value = note ? note.content : "";
   elements.titleInput.disabled = !note;
   elements.noteEditor.disabled = !note;
+  updateActionButtons(note);
+}
+
+function updateActionButtons(note) {
+  elements.copyNote.disabled = !note || !note.content;
+  elements.openLinks.disabled = !note || !extractLinks(note.content).length;
+  elements.deleteNote.disabled = !note;
 }
 
 function getActiveNote() {
@@ -357,6 +429,22 @@ async function saveIndexOnly() {
   await storage.set({ [INDEX_KEY]: index });
 }
 
+async function removeStoredNote(note) {
+  const metaKey = noteMetaKey(note.id);
+  const storedMeta = (await storage.get(metaKey))[metaKey];
+  const indexMeta = index.notes[note.id];
+  const chunkCount = Number(
+    (storedMeta && storedMeta.chunkCount) ||
+      (indexMeta && indexMeta.chunkCount) ||
+      chunkText(note.content).length,
+  );
+  const keys = [metaKey];
+  for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex += 1) {
+    keys.push(noteChunkKey(note.id, chunkIndex));
+  }
+  await storage.remove(keys);
+}
+
 async function saveNote(note) {
   const chunks = chunkText(note.content);
   const metaKey = noteMetaKey(note.id);
@@ -417,6 +505,49 @@ function cleanTitle(value) {
     return "";
   }
   return value.replace(/\s+/g, " ").trim().slice(0, MAX_TITLE_LENGTH);
+}
+
+function extractLinks(text) {
+  const matches = text.match(/\b(?:https?:\/\/|www\.)[^\s<>"']+/gi) || [];
+  return [...new Set(matches.map(normalizeLink).filter(Boolean))];
+}
+
+function normalizeLink(value) {
+  const cleaned = value.replace(/[),.;:!?]+$/g, "");
+  const urlString = cleaned.startsWith("www.") ? `https://${cleaned}` : cleaned;
+  try {
+    const url = new URL(urlString);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url.href;
+    }
+  } catch (error) {
+    return "";
+  }
+  return "";
+}
+
+async function openUrl(url) {
+  if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.create) {
+    await new Promise((resolve) => chrome.tabs.create({ url }, resolve));
+    return;
+  }
+  window.open(url, "_blank", "noopener");
+}
+
+async function writeClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  document.body.append(textarea);
+  textarea.focus();
+  textarea.select();
+  document.execCommand("copy");
+  textarea.remove();
 }
 
 function formatDate(timestamp) {

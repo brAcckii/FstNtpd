@@ -1,7 +1,7 @@
-Install locally:
+Install FstNtpd locally:
 1. Open chrome://extensions.
 2. Enable Developer mode.
-3. Click Load unpacked and choose this folder: chrome-sync-notepad.
+3. Click Load unpacked and choose the FstNtpd extension folder.
 4. Sign into Chrome and enable sync to sync notes through the Google/Chrome account.
 
 Package contents:
@@ -9,5 +9,6 @@ Package contents:
 - popup.html
 - popup.css
 - popup.js
+- icons/
 
 Notes are stored with chrome.storage.sync. Chrome enforces sync storage quota, so very large note collections may need trimming.
